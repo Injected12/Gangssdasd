@@ -71,58 +71,38 @@ end)
 
 -- Functions
 function OpenGangAdminPanel()
-    print("GANGADMIN: Starting to open panel")
-    
-    -- Demo data for testing (if server callback fails)
-    local demo_gangs = {
-        {
-            name = "ballas",
-            label = "Ballas",
-            color = "#9400D3",
-            memberCount = 8,
-            turfs = 2,
-            points = 250,
-            grades = {
-                {name = "Boss", level = 100},
-                {name = "Underboss", level = 90},
-                {name = "Lieutenant", level = 70},
-                {name = "Soldier", level = 50},
-                {name = "Recruit", level = 0}
-            },
-            members = {
-                {name = "John Doe", citizenid = "ABC123", gradeName = "Boss", isOnline = true},
-                {name = "Jane Smith", citizenid = "DEF456", gradeName = "Lieutenant", isOnline = false}
-            }
-        },
-        {
-            name = "vagos",
-            label = "Los Santos Vagos",
-            color = "#FFFF00",
-            memberCount = 6,
-            turfs = 3,
-            points = 320
-        }
-    }
-    
     -- First open the panel
     SendNUIMessage({
         action = 'openPanel',
         panel = 'gangadmin'
     })
     SetNuiFocus(true, true)
-    print("GANGADMIN: Panel open message sent, focus set")
     
     -- Wait a bit before sending the data to ensure panel is loaded
-    Citizen.Wait(500)
+    Citizen.Wait(200)
     
-    print("GANGADMIN: Sending demo data directly")
-    SendNUIMessage({
-        action = 'setGangsData',
-        gangs = demo_gangs
-    })
-    
-    -- Debug message to console
-    print("GANGADMIN: Panel should now be visible")
+    -- Load gangs data for admin panel
+    QBCore.Functions.TriggerCallback('sv-gangs:server:GetAllGangs', function(gangsData)
+        if gangsData then
+            SendNUIMessage({
+                action = 'setGangsData',
+                gangs = gangsData
+            })
+        else
+            -- Fallback to simplified data structure if server callback fails
+            SendNUIMessage({
+                action = 'setGangsData',
+                gangs = {
+                    {
+                        name = "none", 
+                        label = "No gangs found", 
+                        color = "#3498db",
+                        memberCount = 0
+                    }
+                }
+            })
+        end
+    end)
 end
 
 function OpenGangPanel()
