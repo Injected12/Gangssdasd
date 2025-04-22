@@ -65,6 +65,12 @@ RegisterCommand(Config.Commands.Leaderboard, function()
     OpenGangLeaderboard()
 end)
 
+-- Register key bindings if enabled
+if Config.EnableKeybinds then
+    RegisterKeyMapping(Config.Commands.Panel, 'Open Gang Panel', 'keyboard', Config.Keybinds.GangPanel)
+    RegisterKeyMapping(Config.Commands.Leaderboard, 'Open Gang Leaderboard', 'keyboard', Config.Keybinds.Leaderboard)
+end
+
 -- Event handlers
 RegisterNetEvent('sv-gangs:client:UpdateGangInfo', function(gangData)
     PlayerGang = gangData

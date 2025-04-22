@@ -134,7 +134,7 @@ function ExitTurf()
     currentTurf = nil
     
     QBCore.Functions.Notify('You left the turf war!', 'error')
-}
+end
 
 -- Handle player death in turf
 AddEventHandler('baseevents:onPlayerDied', function()
@@ -219,7 +219,7 @@ function RemoveTurfBlip()
             turf.blip = nil
         end
     end
-}
+end
 
 -- Event handlers
 RegisterNetEvent('sv-gangs:client:SyncActiveTurfs', function(turfs)
