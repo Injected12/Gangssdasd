@@ -1,0 +1,202 @@
+<div class="panel gang-admin-panel">
+    <div class="panel-header">
+        <div>
+            <i class="fas fa-users-cog"></i> Gang Admin Panel
+        </div>
+        <button class="panel-close" onclick="closePanel()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
+    <div class="panel-content">
+        <div class="tabs">
+            <div class="tab active" data-tab="gang-list">Gang List</div>
+            <div class="tab" data-tab="create-gang">Create Gang</div>
+            <div class="tab" data-tab="manage-gang">Manage Gang</div>
+            <div class="tab" data-tab="leaderboard">Leaderboard</div>
+        </div>
+        
+        <!-- Gang List Tab -->
+        <div class="tab-content active" id="gang-list-tab">
+            <div class="panel-section">
+                <div class="panel-section-title">All Gangs</div>
+                
+                <div id="gangs-loading" class="loading">
+                    <div class="spinner"></div>
+                </div>
+                
+                <table class="data-table" id="gangs-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Members</th>
+                            <th>Turfs</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="gangs-list">
+                        <!-- Will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Create Gang Tab -->
+        <div class="tab-content" id="create-gang-tab">
+            <div class="panel-section">
+                <div class="panel-section-title">Create New Gang</div>
+                
+                <form id="create-gang-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="gang-name">Gang Name (internal ID)</label>
+                            <input type="text" id="gang-name" class="form-control" placeholder="eg: ballas" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="gang-label">Gang Label (display name)</label>
+                            <input type="text" id="gang-label" class="form-control" placeholder="eg: The Ballas" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="gang-color">Gang Color</label>
+                        <input type="color" id="gang-color" class="form-control" value="#3498db">
+                    </div>
+                    
+                    <div class="panel-section-title">Gang Ranks</div>
+                    
+                    <div id="gang-ranks-container">
+                        <!-- Ranks will be added here -->
+                    </div>
+                    
+                    <button type="button" id="add-rank-btn" class="action-btn edit">
+                        <i class="fas fa-plus"></i> Add Rank
+                    </button>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-decline" onclick="resetCreateGangForm()">Reset</button>
+                        <button type="submit" class="btn btn-accept">Create Gang</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Manage Gang Tab -->
+        <div class="tab-content" id="manage-gang-tab">
+            <div class="panel-section">
+                <div class="panel-section-title">Manage Gang</div>
+                
+                <div class="form-group">
+                    <label for="select-gang">Select Gang</label>
+                    <select id="select-gang" class="form-control">
+                        <option value="">-- Select Gang --</option>
+                        <!-- Will be populated by JavaScript -->
+                    </select>
+                </div>
+                
+                <div id="manage-gang-content" class="hidden">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-gang-label">Gang Label</label>
+                            <input type="text" id="edit-gang-label" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="edit-gang-color">Gang Color</label>
+                            <input type="color" id="edit-gang-color" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="panel-section-title">Gang Ranks</div>
+                    
+                    <div id="edit-gang-ranks-container">
+                        <!-- Ranks will be added here -->
+                    </div>
+                    
+                    <button type="button" id="edit-add-rank-btn" class="action-btn edit">
+                        <i class="fas fa-plus"></i> Add Rank
+                    </button>
+                    
+                    <div class="panel-section-title">Gang Members</div>
+                    
+                    <table class="data-table" id="gang-members-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Rank</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gang-members-list">
+                            <!-- Will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                    
+                    <div class="panel-section-title">Add Member</div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="search-player">Search Player</label>
+                            <input type="text" id="search-player" class="form-control" placeholder="Name or Citizen ID">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="player-rank">Rank</label>
+                            <select id="player-rank" class="form-control">
+                                <!-- Will be populated by JavaScript -->
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div id="search-results" class="hidden">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Citizen ID</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="search-results-list">
+                                <!-- Will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" id="update-gang-btn" class="btn btn-accept">
+                            Update Gang
+                        </button>
+                        <button type="button" id="delete-gang-btn" class="btn btn-decline">
+                            Delete Gang
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Leaderboard Tab -->
+        <div class="tab-content" id="leaderboard-tab">
+            <div class="panel-section">
+                <div class="panel-section-title">Gang Leaderboard</div>
+                
+                <table class="data-table" id="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Gang</th>
+                            <th>Points</th>
+                            <th>Turfs</th>
+                            <th>Members</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-list">
+                        <!-- Will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

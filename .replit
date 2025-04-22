@@ -1,0 +1,38 @@
+modules = ["lua", "python-3.11"]
+
+[nix]
+channel = "stable-24_05"
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "QBCore Gang System Demo"
+
+[[workflows.workflow]]
+name = "QBCore Gang System Demo"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python demo_server.py"
+waitForPort = 5000
+
+[deployment]
+run = ["sh", "-c", "cd /home/runner/$(pwd | xargs basename) && echo \"Starting FiveM QBCore server...\" && python -m http.server 5000"]
+
+[[ports]]
+localPort = 5000
+externalPort = 80

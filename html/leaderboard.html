@@ -1,0 +1,106 @@
+<div class="panel leaderboard-panel">
+    <div class="panel-header">
+        <div>
+            <i class="fas fa-trophy"></i> Gang Leaderboard
+        </div>
+        <button class="panel-close" onclick="closePanel()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
+    <div class="panel-content">
+        <div class="panel-section">
+            <div class="leaderboard-description">
+                <p>This leaderboard shows the top gangs based on turf control and activity. Gangs earn points by capturing and controlling turfs across the city.</p>
+            </div>
+            
+            <div id="leaderboard-loading" class="loading">
+                <div class="spinner"></div>
+            </div>
+            
+            <div class="leaderboard-container">
+                <!-- Top 3 Gangs -->
+                <div class="top-gangs">
+                    <div class="top-gang second-place" id="second-place">
+                        <div class="position">2</div>
+                        <div class="gang-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="gang-name">-</div>
+                        <div class="gang-points">-</div>
+                    </div>
+                    
+                    <div class="top-gang first-place" id="first-place">
+                        <div class="position">1</div>
+                        <div class="gang-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="gang-name">-</div>
+                        <div class="gang-points">-</div>
+                    </div>
+                    
+                    <div class="top-gang third-place" id="third-place">
+                        <div class="position">3</div>
+                        <div class="gang-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="gang-name">-</div>
+                        <div class="gang-points">-</div>
+                    </div>
+                </div>
+                
+                <!-- Other Gangs Table -->
+                <table class="data-table" id="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Gang</th>
+                            <th>Points</th>
+                            <th>Turfs</th>
+                            <th>Members</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-list">
+                        <!-- Will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="panel-section">
+            <div class="panel-section-title">How to Earn Points</div>
+            
+            <div class="info-cards">
+                <div class="info-card">
+                    <div class="info-card-icon">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </div>
+                    <div class="info-card-title">Capture Turfs</div>
+                    <div class="info-card-description">
+                        Go to a turf location and press E to start a takeover. Defend it until the timer runs out to earn points.
+                    </div>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-card-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="info-card-title">Defend Turfs</div>
+                    <div class="info-card-description">
+                        Keeping control of turfs earns your gang passive points over time. The more turfs you control, the more points you'll earn.
+                    </div>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-card-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="info-card-title">Grow Your Gang</div>
+                    <div class="info-card-description">
+                        Having more active members helps defend turfs and capture new ones. Recruitment is key to success!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

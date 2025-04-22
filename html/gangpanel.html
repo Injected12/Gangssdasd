@@ -1,0 +1,124 @@
+<div class="panel gang-panel">
+    <div class="panel-header">
+        <div>
+            <i class="fas fa-users"></i> <span id="gang-name">Gang Panel</span>
+        </div>
+        <button class="panel-close" onclick="closePanel()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
+    <div class="panel-content">
+        <div class="tabs">
+            <div class="tab active" data-tab="members">Members</div>
+            <div class="tab" data-tab="turfs">Turfs</div>
+            <div class="tab" data-tab="settings">Settings</div>
+        </div>
+        
+        <!-- Members Tab -->
+        <div class="tab-content active" id="members-tab">
+            <div class="panel-section">
+                <div class="panel-section-title">Gang Members</div>
+                
+                <div id="members-loading" class="loading">
+                    <div class="spinner"></div>
+                </div>
+                
+                <table class="data-table" id="members-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Rank</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="members-list">
+                        <!-- Will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="panel-section">
+                <div class="panel-section-title">Invite Player</div>
+                
+                <div id="online-players-loading" class="loading">
+                    <div class="spinner"></div>
+                </div>
+                
+                <table class="data-table" id="online-players-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="online-players-list">
+                        <!-- Will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Turfs Tab -->
+        <div class="tab-content" id="turfs-tab">
+            <div class="panel-section">
+                <div class="panel-section-title">Controlled Turfs</div>
+                
+                <div id="turfs-loading" class="loading">
+                    <div class="spinner"></div>
+                </div>
+                
+                <table class="data-table" id="turfs-table">
+                    <thead>
+                        <tr>
+                            <th>Location</th>
+                            <th>Captured</th>
+                        </tr>
+                    </thead>
+                    <tbody id="turfs-list">
+                        <!-- Will be populated by JavaScript -->
+                    </tbody>
+                </table>
+                
+                <div class="turf-info">
+                    <p>To capture new turfs, go to a turf location and press E to start a takeover.</p>
+                    <p>Gang members can help defend turfs during takeovers by entering the marked area.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Settings Tab -->
+        <div class="tab-content" id="settings-tab">
+            <div class="panel-section">
+                <div class="panel-section-title">Gang Settings</div>
+                
+                <form id="gang-settings-form">
+                    <div class="form-group">
+                        <label for="gang-label">Gang Name</label>
+                        <input type="text" id="gang-label" class="form-control" placeholder="Gang Name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="gang-color">Gang Color</label>
+                        <input type="color" id="gang-color" class="form-control">
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-accept">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="panel-section">
+                <div class="panel-section-title">Actions</div>
+                
+                <div class="dangerous-actions">
+                    <button id="leave-gang-btn" class="btn btn-decline">
+                        <i class="fas fa-sign-out-alt"></i> Leave Gang
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
