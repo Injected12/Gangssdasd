@@ -266,10 +266,14 @@ document.addEventListener('keydown', function(event) {
 // Listen for NUI messages from the game
 window.addEventListener('message', function(event) {
     const data = event.data;
+    console.log("Received message:", data); // Debug logging
     
     if (data.action === 'openPanel') {
         loadPanel(data.panel);
     } 
+    else if (data.action === 'openGangAdmin') {
+        loadPanel('gangadmin'); // Support for older code
+    }
     else if (data.action === 'closePanel') {
         closePanel();
     }
@@ -282,6 +286,11 @@ window.addEventListener('message', function(event) {
     }
     else if (data.action === 'gangInvite') {
         showGangInvite(data);
+    }
+    else if (data.action === 'setGangsData') {
+        if (window.setGangsData) {
+            window.setGangsData(data.gangs);
+        }
     }
 });
 

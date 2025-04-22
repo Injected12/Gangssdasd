@@ -71,19 +71,31 @@ end)
 
 -- Functions
 function OpenGangAdminPanel()
+    -- First open the panel
     SendNUIMessage({
         action = 'openPanel',
         panel = 'gangadmin'
     })
     SetNuiFocus(true, true)
     
+    -- Wait a bit before sending the data to ensure panel is loaded
+    Citizen.Wait(500)
+    
     -- Load gangs data for admin panel
     QBCore.Functions.TriggerCallback('sv-gangs:server:GetAllGangs', function(gangsData)
-        SendNUIMessage({
-            action = 'setGangsData',
-            gangs = gangsData
-        })
+        if gangsData then
+            print("Received gangs data:", json.encode(gangsData))
+            SendNUIMessage({
+                action = 'setGangsData',
+                gangs = gangsData
+            })
+        else
+            print("No gangs data received")
+        end
     end)
+    
+    -- Debug message to console
+    print("OpenGangAdminPanel function called - panel: gangadmin")
 end
 
 function OpenGangPanel()
