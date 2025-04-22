@@ -1,119 +1,242 @@
-// SouthVale RP Gang System - Main JS
+// Main script for SouthVale RP Gang System
 
-let config = {
-    serverName: 'SouthVale RP',
-    logo: 'https://yourserver.com/logo.png',
-    themeColor: '#3498db',
-    backgroundOpacity: 0.85
-};
+// Global variables
+let activePanel = null;
+let gangs = [];
+let gangData = null;
+let turfs = [];
+let leaderboard = [];
+let theme = null;
 
-// Main event listener
-window.addEventListener('message', function(event) {
-    const action = event.data.action;
-    const data = event.data;
-
-    switch (action) {
-        case 'setConfig':
-            config = data.config;
-            applyThemeColor();
-            break;
-        case 'updateGangHUD':
-            updateGangHUD(data);
-            break;
-        case 'gangInvite':
-            showGangInvite(data);
-            break;
-        case 'openGangAdmin':
-            loadPanel('gangadmin');
-            break;
-        case 'openGangPanel':
-            loadPanel('gangpanel');
-            break;
-        case 'openLeaderboard':
-            loadPanel('leaderboard');
-            break;
-        case 'setGangs':
-            if (window.setGangsData) {
-                window.setGangsData(data.gangs);
-            }
-            break;
-        case 'setGangData':
-            if (window.setGangPanelData) {
-                window.setGangPanelData(data.gangData);
-            }
-            break;
-        case 'setGangTurfs':
-            if (window.setGangTurfs) {
-                window.setGangTurfs(data.turfs);
-            }
-            break;
-        case 'setLeaderboardData':
-            if (window.setLeaderboardData) {
-                window.setLeaderboardData(data.leaderboard);
-            }
-            break;
-    }
-});
-
-// Apply theme color to UI elements
+// Apply theme color from Config
 function applyThemeColor() {
-    document.documentElement.style.setProperty('--theme-color', config.themeColor);
-    document.documentElement.style.setProperty('--background-opacity', config.backgroundOpacity);
+    const themeColor = theme || '#3498db';
+    document.documentElement.style.setProperty('--primary-color', themeColor);
 }
 
-// Gang HUD Functions
+// Show/Hide Gang HUD
 function updateGangHUD(data) {
-    const hudElement = document.getElementById('gang-hud');
-    const nameElement = hudElement.querySelector('.gang-name');
-    const rankElement = hudElement.querySelector('.gang-rank');
-
+    const gangHUD = document.getElementById('gang-hud');
+    
     if (data.show) {
-        nameElement.textContent = data.gang.label;
-        rankElement.textContent = data.gang.rank;
+        gangHUD.classList.remove('hidden');
         
-        // Apply gang color
-        nameElement.style.color = data.gang.color || config.themeColor;
+        const gangName = gangHUD.querySelector('.gang-name');
+        const gangRank = gangHUD.querySelector('.gang-rank');
         
-        hudElement.classList.remove('hidden');
+        gangName.textContent = data.gang.label;
+        gangRank.textContent = data.gang.rank;
+        
+        // Apply gang color if provided
+        if (data.gang.color) {
+            gangName.style.color = data.gang.color;
+        }
     } else {
-        hudElement.classList.add('hidden');
+        gangHUD.classList.add('hidden');
     }
 }
 
-// Gang Invite Functions
+// Show gang invite notification
 function showGangInvite(data) {
-    const inviteElement = document.getElementById('gang-invite');
-    const gangNameElement = document.getElementById('gang-invite-name');
-    const inviterElement = document.getElementById('gang-invite-from');
+    const gangInvite = document.getElementById('gang-invite');
+    gangInvite.classList.remove('hidden');
     
-    gangNameElement.textContent = data.gangName;
-    inviterElement.textContent = data.inviterName;
+    document.getElementById('gang-invite-name').textContent = data.gangName;
+    document.getElementById('gang-invite-from').textContent = data.inviterName;
     
-    inviteElement.classList.remove('hidden');
+    // Handle accept button
+    document.getElementById('accept-invite').onclick = function() {
+        gangInvite.classList.add('hidden');
+        fetch('https://sv-gangs/acceptInvite', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+        });
+    };
     
-    // Auto-hide after 30 seconds
-    setTimeout(() => {
-        inviteElement.classList.add('hidden');
-    }, 30000);
+    // Handle decline button
+    document.getElementById('decline-invite').onclick = function() {
+        gangInvite.classList.add('hidden');
+        fetch('https://sv-gangs/declineInvite', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+        });
+    };
 }
 
-// Load panel HTML content
+// Load panel (admin, gang panel, leaderboard)
 function loadPanel(panelName) {
     const mainContainer = document.getElementById('main-container');
+    mainContainer.classList.remove('hidden');
     
-    fetch(`${panelName}.html`)
+    // First check if we need to load HTML content
+    fetch(`html/${panelName}.html`)
         .then(response => response.text())
         .then(html => {
             mainContainer.innerHTML = html;
-            mainContainer.classList.remove('hidden');
             
-            // Load additional scripts
-            const script = document.createElement('script');
-            script.src = `${panelName}.js`;
-            document.body.appendChild(script);
+            // Set active panel
+            activePanel = panelName;
             
-            applyThemeColor();
+            // Initialize panel scripts
+            if (panelName === 'gangadmin') {
+                // Load gangadmin.js if not already loaded
+                if (!window.initializeCreateGangForm) {
+                    loadScript('html/gangadmin.js')
+                        .then(() => {
+                            // Initialize admin panel
+                            if (window.gangAdminInit) {
+                                window.gangAdminInit();
+                            }
+                        });
+                } else if (window.gangAdminInit) {
+                    window.gangAdminInit();
+                }
+            } 
+            else if (panelName === 'gangpanel') {
+                // Load gangpanel.js if not already loaded
+                if (!window.updateGangPanel) {
+                    loadScript('html/gangpanel.js')
+                        .then(() => {
+                            // Load gang panel data
+                            loadGangPanelData();
+                        });
+                } else {
+                    loadGangPanelData();
+                }
+            }
+            else if (panelName === 'leaderboard') {
+                // Load leaderboard.js if not already loaded
+                if (!window.updateLeaderboard) {
+                    loadScript('html/leaderboard.js')
+                        .then(() => {
+                            // Load leaderboard data
+                            loadLeaderboardData();
+                        });
+                } else {
+                    loadLeaderboardData();
+                }
+            }
+            
+            // Setup tab navigation
+            setupTabNavigation();
+            
+            // Setup close button
+            setupCloseButton();
+        })
+        .catch(error => {
+            console.error(`Error loading panel ${panelName}:`, error);
         });
+}
+
+// Helper function to load scripts
+function loadScript(src) {
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+    });
+}
+
+// Load gang panel data
+function loadGangPanelData() {
+    fetch('https://sv-gangs/getGangData', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (window.setGangPanelData) {
+            window.setGangPanelData(data);
+        }
+    })
+    .catch(error => {
+        console.error('Error loading gang panel data:', error);
+    });
+    
+    // Load gang turf data
+    fetch('https://sv-gangs/getGangTurfs', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (window.setGangTurfs) {
+            window.setGangTurfs(data.turfs);
+        }
+    })
+    .catch(error => {
+        console.error('Error loading gang turf data:', error);
+    });
+}
+
+// Load leaderboard data
+function loadLeaderboardData() {
+    fetch('https://sv-gangs/getLeaderboardData', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (window.setLeaderboardData) {
+            window.setLeaderboardData(data.leaderboard);
+        }
+    })
+    .catch(error => {
+        console.error('Error loading leaderboard data:', error);
+    });
+}
+
+// Setup tab navigation
+function setupTabNavigation() {
+    const tabs = document.querySelectorAll('.tab');
+    if (tabs.length > 0) {
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                this.classList.add('active');
+                
+                // Hide all tab content
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // Show selected tab content
+                const tabId = this.getAttribute('data-tab');
+                const tabContent = document.getElementById(tabId + '-tab');
+                if (tabContent) {
+                    tabContent.classList.add('active');
+                }
+            });
+        });
+    }
+}
+
+// Setup close button
+function setupCloseButton() {
+    const closeButton = document.querySelector('.panel-close');
+    if (closeButton) {
+        closeButton.addEventListener('click', closePanel);
+    }
 }
 
 // Close panel
@@ -121,47 +244,57 @@ function closePanel() {
     const mainContainer = document.getElementById('main-container');
     mainContainer.classList.add('hidden');
     mainContainer.innerHTML = '';
+    activePanel = null;
     
-    // Notify FiveM client that panel is closed
+    // Notify resource that panel was closed
     fetch('https://sv-gangs/closePanel', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json; charset=UTF-8',
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({})
     });
 }
 
-// Respond to gang invite
-document.getElementById('accept-invite').addEventListener('click', function() {
-    fetch('https://sv-gangs/respondToGangInvite', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: JSON.stringify({
-            accept: true
-        })
-    });
-    
-    document.getElementById('gang-invite').classList.add('hidden');
+// Handle keypress events (ESC to close panel)
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape' && activePanel) {
+        closePanel();
+    }
 });
 
-document.getElementById('decline-invite').addEventListener('click', function() {
-    fetch('https://sv-gangs/respondToGangInvite', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: JSON.stringify({
-            accept: false
-        })
-    });
+// Listen for NUI messages from the game
+window.addEventListener('message', function(event) {
+    const data = event.data;
     
-    document.getElementById('gang-invite').classList.add('hidden');
+    if (data.action === 'openPanel') {
+        loadPanel(data.panel);
+    } 
+    else if (data.action === 'closePanel') {
+        closePanel();
+    }
+    else if (data.action === 'updateGangHUD') {
+        updateGangHUD(data);
+    }
+    else if (data.action === 'setThemeColor') {
+        theme = data.color;
+        applyThemeColor();
+    }
+    else if (data.action === 'gangInvite') {
+        showGangInvite(data);
+    }
 });
 
-// Initialize
+// On document load
 document.addEventListener('DOMContentLoaded', function() {
+    // Apply theme color
     applyThemeColor();
+    
+    // Check if panel should be automatically loaded (for development/testing)
+    const urlParams = new URLSearchParams(window.location.search);
+    const panel = urlParams.get('panel');
+    
+    if (panel) {
+        loadPanel(panel);
+    }
 });
