@@ -67,8 +67,13 @@ end)
 
 -- Register key bindings if enabled
 if Config.EnableKeybinds then
-    RegisterKeyMapping(Config.Commands.Panel, 'Open Gang Panel', 'keyboard', Config.Keybinds.GangPanel)
-    RegisterKeyMapping(Config.Commands.Leaderboard, 'Open Gang Leaderboard', 'keyboard', Config.Keybinds.Leaderboard)
+    if Config.Keybinds.GangPanel then
+        RegisterKeyMapping(Config.Commands.Panel, 'Open Gang Panel', 'keyboard', Config.Keybinds.GangPanel)
+    end
+    
+    if Config.Keybinds.Leaderboard then
+        RegisterKeyMapping(Config.Commands.Leaderboard, 'Open Gang Leaderboard', 'keyboard', Config.Keybinds.Leaderboard)
+    end
 end
 
 -- Event handlers

@@ -1,50 +1,110 @@
-# SouthVale RP Gang System - Installation Guide
+# SouthVale RP - QBCore Gang System
 
-This comprehensive guide will walk you through the installation and setup process for the SouthVale RP Gang System for QBCore.
+## Installation Guide
 
-## Requirements
-
+### Prerequisites
 - QBCore Framework
-- oxmysql
+- MySQL Database
+- FiveM Server
 
-## Step 1: Resource Installation
-
-1. Download the resource files
-2. Place the folder in your server's resources directory
-3. Ensure the folder is named `sv-gangs` (or update references if you choose a different name)
-
-## Step 2: Database Setup
-
-The script will automatically create the necessary database tables when the resource starts for the first time. However, you can manually create them if needed:
+### Step 1: Database Setup
+Execute the following SQL commands in your database:
 
 ```sql
+-- Create gangs table
 CREATE TABLE IF NOT EXISTS `gangs` (
-    `gang` VARCHAR(50) NOT NULL,
-    `label` VARCHAR(50) NOT NULL,
-    `color` VARCHAR(10) NOT NULL DEFAULT '#3498db',
-    `points` INT NOT NULL DEFAULT 0,
-    PRIMARY KEY (`gang`)
-);
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `gang` varchar(50) NOT NULL,
+  `label` varchar(50) NOT NULL,
+  `color` varchar(20) DEFAULT '#3498db',
+  `points` int(11) DEFAULT 0,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `gang` (`gang`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `gang_turfs` (
-    `id` INT NOT NULL AUTO_INCREMENT,
-    `gang` VARCHAR(50) NOT NULL,
-    `location_x` FLOAT NOT NULL,
-    `location_y` FLOAT NOT NULL,
-    `location_z` FLOAT NOT NULL,
-    `name` VARCHAR(100) NOT NULL,
-    `last_captured` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`),
-    FOREIGN KEY (`gang`) REFERENCES `gangs`(`gang`)
-    ON DELETE CASCADE ON UPDATE CASCADE
-);
-
+-- Create gang ranks table
 CREATE TABLE IF NOT EXISTS `gang_ranks` (
-    `gang` VARCHAR(50) NOT NULL,
-    `grade` INT NOT NULL,
-    `name` VARCHAR(50) NOT NULL,
-    `level` INT NOT NULL,
-    PRIMARY KEY (`gang`, `grade`),
-    FOREIGN KEY (`gang`) REFERENCES `gangs`(`gang`)
-    ON DELETE CASCADE ON UPDATE CASCADE
-);
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `gang` varchar(50) NOT NULL,
+  `grade` int(11) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `level` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `gang` (`gang`),
+  CONSTRAINT `gang_ranks_ibfk_1` FOREIGN KEY (`gang`) REFERENCES `gangs` (`gang`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Create gang turfs table
+CREATE TABLE IF NOT EXISTS `gang_turfs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `gang` varchar(50) NOT NULL,
+  `location_x` float NOT NULL,
+  `location_y` float NOT NULL,
+  `location_z` float NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `last_captured` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `gang` (`gang`),
+  CONSTRAINT `gang_turfs_ibfk_1` FOREIGN KEY (`gang`) REFERENCES `gangs` (`gang`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+```
+
+### Step 2: Resource Installation
+
+1. Download the resource and place it in your server's resources folder
+2. Add `ensure sv-gangs` to your server.cfg file (adjust name if different)
+3. Ensure it loads after qb-core
+
+### Step 3: Configuration
+
+Customize the `config.lua` file to fit your server's needs:
+
+- Set proper admin permissions
+- Adjust turf locations to match your map
+- Configure keybinds and commands
+- Set up default gang ranks and colors
+- Enable or disable specific features
+
+### Step 4: Initial Setup
+
+After installation, use the `/gangadmin` command as an admin to:
+
+1. Create initial gangs with custom names, colors, and ranks
+2. Assign players to gangs through the admin panel
+
+### Commands
+
+- `/gangadmin` - Open the admin panel (admin only)
+- `/gangpanel` - Open the gang management panel (gang leaders only)
+- `/gangleaderboard` - View gang leaderboard (available to everyone)
+- `/toggleganghud` - Toggle gang HUD display
+
+### Keybinds (Default)
+
+- `F6` - Open gang panel
+- `F7` - Open gang leaderboard
+- `F9` - Toggle gang HUD
+
+### Features
+
+- **Gang Management**
+  - Create and manage gangs with custom names, colors and ranks
+  - Control membership with promotion, demotion and removal capabilities
+  - Invite new members to your gang
+
+- **Territory Control**
+  - Capture and control turf zones
+  - Earn points for your gang by holding territories
+  - Engage in turf wars with other gangs
+
+- **Leaderboard System**
+  - Track gang standings based on points and turf control
+  - View which gangs are dominant on your server
+
+- **Gang HUD**
+  - Display gang affiliation and rank in the UI
+  - Customize colors and appearance
+
+### Support
+
+For support or questions, contact the development team at SouthVale RP.

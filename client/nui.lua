@@ -3,20 +3,14 @@
 
 local QBCore = exports['qb-core']:GetCoreObject()
 
--- NUI Callbacks
-RegisterNUICallback('closePanel', function(_, cb)
+-- NUI Callback events
+RegisterNUICallback('closePanel', function(data, cb)
     SetNuiFocus(false, false)
     cb('ok')
 end)
 
--- Gang Admin Callbacks
 RegisterNUICallback('createGang', function(data, cb)
     TriggerServerEvent('sv-gangs:server:CreateGang', data)
-    cb('ok')
-end)
-
-RegisterNUICallback('deleteGang', function(data, cb)
-    TriggerServerEvent('sv-gangs:server:DeleteGang', data.name)
     cb('ok')
 end)
 
@@ -25,116 +19,142 @@ RegisterNUICallback('updateGang', function(data, cb)
     cb('ok')
 end)
 
-RegisterNUICallback('addMemberToGang', function(data, cb)
-    TriggerServerEvent('sv-gangs:server:AddMemberToGang', data.gangName, data.citizenid, data.rankLevel)
+RegisterNUICallback('deleteGang', function(data, cb)
+    TriggerServerEvent('sv-gangs:server:DeleteGang', data.gangName)
     cb('ok')
 end)
 
-RegisterNUICallback('removeMemberFromGang', function(data, cb)
-    TriggerServerEvent('sv-gangs:server:RemoveMemberFromGang', data.gangName, data.citizenid)
+RegisterNUICallback('addMember', function(data, cb)
+    TriggerServerEvent('sv-gangs:server:AddGangMember', data.gangName, data.playerId, data.rankLevel)
     cb('ok')
 end)
 
-RegisterNUICallback('updateGangRanks', function(data, cb)
-    TriggerServerEvent('sv-gangs:server:UpdateGangRanks', data.gangName, data.ranks)
+RegisterNUICallback('removeMember', function(data, cb)
+    TriggerServerEvent('sv-gangs:server:RemoveGangMember', data.gangName, data.citizenid)
     cb('ok')
 end)
 
-RegisterNUICallback('getPlayerByCitizenId', function(data, cb)
-    QBCore.Functions.TriggerCallback('sv-gangs:server:GetPlayerByCitizenId', function(player)
-        cb(player)
-    end, data.citizenid)
+RegisterNUICallback('promoteMember', function(data, cb)
+    TriggerServerEvent('sv-gangs:server:PromoteGangMember', data.gangName, data.citizenid)
+    cb('ok')
 end)
 
-RegisterNUICallback('searchPlayers', function(data, cb)
-    QBCore.Functions.TriggerCallback('sv-gangs:server:SearchPlayers', function(players)
-        cb(players)
-    end, data.query)
+RegisterNUICallback('demoteMember', function(data, cb)
+    TriggerServerEvent('sv-gangs:server:DemoteGangMember', data.gangName, data.citizenid)
+    cb('ok')
 end)
 
--- Gang Panel Callbacks
-RegisterNUICallback('inviteToGang', function(data, cb)
+RegisterNUICallback('invitePlayer', function(data, cb)
     TriggerServerEvent('sv-gangs:server:InviteToGang', data.playerId)
     cb('ok')
 end)
 
-RegisterNUICallback('kickFromGang', function(data, cb)
-    TriggerServerEvent('sv-gangs:server:KickFromGang', data.citizenid)
+RegisterNUICallback('leaveGang', function(data, cb)
+    TriggerServerEvent('sv-gangs:server:LeaveGang')
     cb('ok')
 end)
 
-RegisterNUICallback('promoteGangMember', function(data, cb)
-    TriggerServerEvent('sv-gangs:server:PromoteGangMember', data.citizenid)
+RegisterNUICallback('saveGangSettings', function(data, cb)
+    TriggerServerEvent('sv-gangs:server:UpdateGangSettings', data)
     cb('ok')
 end)
 
-RegisterNUICallback('demoteGangMember', function(data, cb)
-    TriggerServerEvent('sv-gangs:server:DemoteGangMember', data.citizenid)
-    cb('ok')
+RegisterNUICallback('searchPlayers', function(data, cb)
+    QBCore.Functions.TriggerCallback('sv-gangs:server:SearchPlayers', function(result)
+        cb(result)
+    end, data.query)
 end)
 
-RegisterNUICallback('setGangMemberRank', function(data, cb)
-    TriggerServerEvent('sv-gangs:server:SetGangMemberRank', data.citizenid, data.rankLevel)
-    cb('ok')
-end)
-
-RegisterNUICallback('updateGangInfo', function(data, cb)
-    TriggerServerEvent('sv-gangs:server:UpdateGangInfo', data)
-    cb('ok')
-end)
-
-RegisterNUICallback('refreshGangData', function(_, cb)
-    QBCore.Functions.TriggerCallback('sv-gangs:server:GetGangData', function(gangData)
-        cb(gangData)
-    end)
-end)
-
-RegisterNUICallback('getOnlinePlayers', function(_, cb)
-    QBCore.Functions.TriggerCallback('sv-gangs:server:GetOnlinePlayers', function(players)
-        cb(players)
-    end)
-end)
-
-RegisterNUICallback('getGangMembers', function(_, cb)
-    QBCore.Functions.TriggerCallback('sv-gangs:server:GetGangMembers', function(members)
-        cb(members)
-    end)
-end)
-
--- Leaderboard Callbacks
-RegisterNUICallback('refreshLeaderboard', function(_, cb)
-    QBCore.Functions.TriggerCallback('sv-gangs:server:GetGangLeaderboard', function(leaderboard)
-        cb(leaderboard)
-    end)
-end)
-
--- Events from server
-RegisterNetEvent('sv-gangs:client:GangInvite', function(gangName, inviterName)
+-- Opens NUI panel with data
+function OpenGangAdminPanel()
     SendNUIMessage({
-        action = 'gangInvite',
-        gangName = gangName,
-        inviterName = inviterName
+        action = 'openPanel',
+        panel = 'gangadmin'
     })
+    SetNuiFocus(true, true)
     
-    -- Also show notification
-    QBCore.Functions.Notify('You have been invited to join ' .. gangName .. ' by ' .. inviterName, 'primary', 10000)
-end)
+    -- Load gangs data for admin panel
+    QBCore.Functions.TriggerCallback('sv-gangs:server:GetAllGangs', function(gangsData)
+        SendNUIMessage({
+            action = 'setGangsData',
+            gangs = gangsData
+        })
+    end)
+end
 
--- Callback for accepting/declining gang invite
-RegisterNUICallback('respondToGangInvite', function(data, cb)
-    TriggerServerEvent('sv-gangs:server:RespondToGangInvite', data.accept)
-    cb('ok')
-end)
-
--- Send UI configuration
-RegisterNetEvent('sv-gangs:client:SendUIConfig', function()
+function OpenGangPanel()
     SendNUIMessage({
-        action = 'setConfig',
-        config = {
-            serverName = Config.ServerName,
-            logo = Config.Logo,
-            themeColor = Config.UIThemeColor,
-            backgroundOpacity = Config.UIBackgroundOpacity
-        }
+        action = 'openPanel',
+        panel = 'gangpanel'
     })
-end)
+    SetNuiFocus(true, true)
+    
+    -- Load gang data for gang panel
+    QBCore.Functions.TriggerCallback('sv-gangs:server:GetPlayerGangData', function(gangData)
+        SendNUIMessage({
+            action = 'setGangPanelData',
+            gangData = gangData
+        })
+    end)
+    
+    -- Load gang turfs
+    QBCore.Functions.TriggerCallback('sv-gangs:server:GetGangTurfs', function(turfsData)
+        SendNUIMessage({
+            action = 'setGangTurfs',
+            turfs = turfsData
+        })
+    end)
+end
+
+function OpenLeaderboardPanel()
+    SendNUIMessage({
+        action = 'openPanel',
+        panel = 'leaderboard'
+    })
+    SetNuiFocus(true, true)
+    
+    -- Load leaderboard data
+    QBCore.Functions.TriggerCallback('sv-gangs:server:GetLeaderboard', function(leaderboardData)
+        SendNUIMessage({
+            action = 'setLeaderboardData',
+            leaderboard = leaderboardData
+        })
+    end)
+end
+
+-- Register command to open admin panel
+RegisterCommand(Config.Commands.Admin, function()
+    QBCore.Functions.TriggerCallback('sv-gangs:server:IsPlayerAdmin', function(isAdmin)
+        if isAdmin then
+            OpenGangAdminPanel()
+        else
+            QBCore.Functions.Notify('You do not have permission to use this command', 'error')
+        end
+    end)
+end, false)
+
+-- Register command to open gang panel
+RegisterCommand(Config.Commands.Panel, function()
+    local Player = QBCore.Functions.GetPlayerData()
+    if Player.gang.name ~= 'none' then
+        QBCore.Functions.TriggerCallback('sv-gangs:server:GetGangRankLevel', function(rankLevel)
+            if rankLevel and rankLevel >= 70 then -- Lieutenant or higher
+                OpenGangPanel()
+            else
+                QBCore.Functions.Notify('Only high-ranking gang members can access the gang panel', 'error')
+            end
+        end)
+    else
+        QBCore.Functions.Notify('You are not in a gang', 'error')
+    end
+end, false)
+
+-- Register command to open leaderboard
+RegisterCommand(Config.Commands.Leaderboard, function()
+    OpenLeaderboardPanel()
+end, false)
+
+-- Command suggestions
+TriggerEvent('chat:addSuggestion', '/' .. Config.Commands.Admin, 'Open the gang admin panel', {})
+TriggerEvent('chat:addSuggestion', '/' .. Config.Commands.Panel, 'Open your gang management panel', {})
+TriggerEvent('chat:addSuggestion', '/' .. Config.Commands.Leaderboard, 'View the gang leaderboard', {})

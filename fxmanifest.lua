@@ -14,7 +14,9 @@ client_scripts {
     'client/main.lua',
     'client/nui.lua',
     'client/turf.lua',
-    'client/hud.lua'
+    'client/turf_system.lua',
+    'client/gang_hud.lua',
+    'client/commands.lua'
 }
 
 server_scripts {
