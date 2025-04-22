@@ -44,39 +44,7 @@ RegisterNetEvent('sv-gangs:client:OpenLeaderboard', function()
     OpenLeaderboardPanel()
 end)
 
--- Gang commands
-RegisterCommand(Config.Commands.Admin, function()
-    if not isLoggedIn then return end
-    
-    QBCore.Functions.TriggerCallback('sv-gangs:server:CheckAdminPermission', function(hasPermission)
-        if hasPermission then
-            OpenGangAdminPanel()
-        else
-            QBCore.Functions.Notify('You do not have permission to use this command.', 'error')
-        end
-    end)
-end)
-
-RegisterCommand(Config.Commands.Panel, function()
-    if not isLoggedIn then return end
-    
-    if PlayerGang.name ~= 'none' then
-        QBCore.Functions.TriggerCallback('sv-gangs:server:GetGangRankLevel', function(rankLevel)
-            if rankLevel >= 80 then -- Only high ranking members (Boss, Underboss, Capo)
-                OpenGangPanel()
-            else
-                QBCore.Functions.Notify('Only high-ranking gang members can access the gang panel.', 'error')
-            end
-        end)
-    else
-        QBCore.Functions.Notify('You are not in a gang.', 'error')
-    end
-end)
-
-RegisterCommand(Config.Commands.Leaderboard, function()
-    if not isLoggedIn then return end
-    OpenGangLeaderboard()
-end)
+-- Commands and key bindings are now managed in commands.lua
 
 -- Register key bindings if enabled
 if Config.EnableKeybinds then
@@ -104,49 +72,56 @@ end)
 -- Functions
 function OpenGangAdminPanel()
     SendNUIMessage({
-        action = 'openGangAdmin'
+        action = 'openPanel',
+        panel = 'gangadmin'
     })
     SetNuiFocus(true, true)
     
-    QBCore.Functions.TriggerCallback('sv-gangs:server:GetAllGangs', function(gangs)
+    -- Load gangs data for admin panel
+    QBCore.Functions.TriggerCallback('sv-gangs:server:GetAllGangs', function(gangsData)
         SendNUIMessage({
-            action = 'setGangs',
-            gangs = gangs
+            action = 'setGangsData',
+            gangs = gangsData
         })
     end)
 end
 
 function OpenGangPanel()
     SendNUIMessage({
-        action = 'openGangPanel'
+        action = 'openPanel',
+        panel = 'gangpanel'
     })
     SetNuiFocus(true, true)
     
-    QBCore.Functions.TriggerCallback('sv-gangs:server:GetGangData', function(gangData)
+    -- Load gang data for gang panel
+    QBCore.Functions.TriggerCallback('sv-gangs:server:GetPlayerGangData', function(gangData)
         SendNUIMessage({
-            action = 'setGangData',
+            action = 'setGangPanelData',
             gangData = gangData
         })
     end)
     
-    QBCore.Functions.TriggerCallback('sv-gangs:server:GetGangTurfs', function(turfs)
+    -- Load gang turfs
+    QBCore.Functions.TriggerCallback('sv-gangs:server:GetGangTurfs', function(turfsData)
         SendNUIMessage({
             action = 'setGangTurfs',
-            turfs = turfs
+            turfs = turfsData
         })
     end)
 end
 
-function OpenGangLeaderboard()
+function OpenLeaderboardPanel()
     SendNUIMessage({
-        action = 'openLeaderboard'
+        action = 'openPanel',
+        panel = 'leaderboard'
     })
     SetNuiFocus(true, true)
     
-    QBCore.Functions.TriggerCallback('sv-gangs:server:GetGangLeaderboard', function(leaderboard)
+    -- Load leaderboard data
+    QBCore.Functions.TriggerCallback('sv-gangs:server:GetLeaderboard', function(leaderboardData)
         SendNUIMessage({
             action = 'setLeaderboardData',
-            leaderboard = leaderboard
+            leaderboard = leaderboardData
         })
     end)
 end

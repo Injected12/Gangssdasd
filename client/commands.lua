@@ -9,6 +9,7 @@ RegisterCommand(Config.Commands.Admin, function()
     
     QBCore.Functions.TriggerCallback('sv-gangs:server:IsPlayerAdmin', function(isAdmin)
         if isAdmin then
+            -- Use the function from main.lua to open the admin panel
             OpenGangAdminPanel()
         else
             QBCore.Functions.Notify('You do not have permission to use this command', 'error')
