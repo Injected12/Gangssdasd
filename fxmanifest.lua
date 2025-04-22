@@ -24,7 +24,8 @@ server_scripts {
     'server/main.lua',
     'server/database.lua',
     'server/gangs.lua',
-    'server/turfs.lua'
+    'server/turfs.lua',
+    'server/callbacks.lua'
 }
 
 ui_page 'html/index.html'

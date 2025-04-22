@@ -31,6 +31,19 @@ RegisterNetEvent('QBCore:Client:OnGangUpdate', function(gang)
     end
 end)
 
+-- Panel events
+RegisterNetEvent('sv-gangs:client:OpenAdminPanel', function()
+    OpenGangAdminPanel()
+end)
+
+RegisterNetEvent('sv-gangs:client:OpenGangPanel', function()
+    OpenGangPanel()
+end)
+
+RegisterNetEvent('sv-gangs:client:OpenLeaderboard', function()
+    OpenLeaderboardPanel()
+end)
+
 -- Gang commands
 RegisterCommand(Config.Commands.Admin, function()
     if not isLoggedIn then return end
