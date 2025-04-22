@@ -112,7 +112,7 @@ end
 function DeleteGangFromDatabase(name)
     -- Delete gang (cascade will remove ranks and turfs)
     MySQL.Async.execute('DELETE FROM gangs WHERE gang = ?', {name})
-}
+end
 
 -- Update gang in database
 function UpdateGangInDatabase(name, label, color, ranks)

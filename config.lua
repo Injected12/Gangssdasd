@@ -23,15 +23,31 @@ Config.DefaultGangRanks = { -- Default ranks for new gangs
     { name = "Recruit", level = 0 }
 }
 
+-- Gang-specific colors (will override default color for these gangs)
+Config.GangColors = {
+    ["ballas"] = "#9b59b6", -- Purple for Ballas
+    ["vagos"] = "#f1c40f",  -- Yellow for Vagos
+    ["families"] = "#2ecc71", -- Green for Families
+    ["triads"] = "#e74c3c"  -- Red for Triads
+}
+
 -- UI settings
 Config.UIThemeColor = "#3498db" -- Primary theme color
 Config.UIBackgroundOpacity = 0.85 -- Background opacity for UI (0.0 - 1.0)
 
 -- HUD settings
 Config.EnableGangHUD = true -- Enable or disable the gang HUD
-Config.GangHUDPosition = "top-right" -- Position of the gang HUD (top-left, top-right, bottom-left, bottom-right)
-Config.GangHUDOffsetX = -10 -- X offset for the gang HUD
-Config.GangHUDOffsetY = 10 -- Y offset for the gang HUD
+Config.HUDPosition = "top-right" -- Position of the gang HUD (top-left, top-right, bottom-left, bottom-right)
+Config.HUDOffsetX = -10 -- X offset for the gang HUD
+Config.HUDOffsetY = 10 -- Y offset for the gang HUD
+
+-- Keybind settings
+Config.EnableKeybinds = true -- Enable or disable keybinds
+Config.Keybinds = {
+    GangPanel = "F6", -- Keybind to open gang panel (only for members with appropriate rank)
+    Leaderboard = "F7", -- Keybind to open gang leaderboard (available to everyone)
+    ToggleHUD = "F9" -- Keybind to toggle the gang HUD
+}
 
 -- Turf settings
 Config.TurfCaptureDuration = 200 -- Duration of turf capture in seconds

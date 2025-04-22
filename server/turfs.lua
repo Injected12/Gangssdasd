@@ -305,7 +305,7 @@ function EndTurfCapture(turfId)
         else
             -- Create new turf record
             AddTurfToGang(winningGang, turf.location.x, turf.location.y, turf.location.z, turf.location.name)
-        }
+        end
         
         -- Add points to winning gang
         AddGangPoints(winningGang, Config.TurfRewardPoints)
@@ -322,7 +322,7 @@ function EndTurfCapture(turfId)
         for _, member in ipairs(gangMembers) do
             TriggerClientEvent('QBCore:Notify', member.src, 'Your gang has captured the turf at ' .. turf.location.name .. '!', 'success', 10000)
         end
-    }
+    end
     
     -- Notify clients that turf war ended
     for src, _ in pairs(turf.participants) do
@@ -341,7 +341,7 @@ function EndTurfCapture(turfId)
     
     -- Sync active turfs
     SyncActiveTurfs()
-}
+end
 
 -- Sync active turfs to all clients
 function SyncActiveTurfs()
